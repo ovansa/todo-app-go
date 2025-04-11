@@ -15,9 +15,6 @@ jobs:
         image: mongo:6.0
         ports:
           - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: testuser
-          MONGO_INITDB_ROOT_PASSWORD: testpass
         options: >-
           --auth
           --health-cmd "mongosh --eval 'db.runCommand(\"ping\").ok'"
@@ -36,7 +33,7 @@ jobs:
 
       - name: Create test .env file
         run: |
-          echo "MONGO_URI=mongodb://testuser:testpass@localhost:27017" > .env
+          echo "MONGO_URI=mongodb://localhost:27017" > .env
           echo "DATABASE_NAME=test_db" >> .env
           echo "JWT_SECRET=test-secret-key" >> .env
           echo "JWT_EXPIRATION=24" >> .env
