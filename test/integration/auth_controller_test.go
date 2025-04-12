@@ -2,15 +2,16 @@ package integration
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"testing"
 	"time"
 	"todo-app/internal/auth"
 	"todo-app/internal/config"
 	"todo-app/internal/controller"
+	"todo-app/internal/errors"
 	"todo-app/internal/model"
 	"todo-app/internal/repository"
+	"todo-app/internal/routes"
 	"todo-app/pkg/database"
 	"todo-app/test/testhelpers"
 
@@ -43,8 +44,7 @@ func (suite *AuthControllerTestSuite) SetupSuite() {
 	// Setup Gin
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
-	router.POST("/auth/register", suite.authController.Register)
-	router.POST("/auth/login", suite.authController.Login)
+	routes.SetupRoutes(router, suite.authController, nil, suite.authService)
 	suite.router = router
 
 	// Clear the database before running tests
@@ -96,17 +96,15 @@ func (suite *AuthControllerTestSuite) TestRegister_DuplicateEmail() {
 	suite.NoError(err, "Failed to create test user")
 
 	newUser := model.User{
-		Email:    testUser.Email,
+		Email:    "test123@example.com",
 		Password: "newpassword123",
 	}
 	w := testhelpers.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/register", newUser, "")
+	suite.Equal(http.StatusConflict, w.Code)
 
-	suite.Equal(http.StatusBadRequest, w.Code)
-
-	var response map[string]string
+	var response map[string]interface{}
 	testhelpers.ParseResponse(suite.T(), w, &response)
-	log.Printf("Response: %v", response)
-	suite.Equal("email already exists", response["error"])
+	suite.Equal(errors.ErrDuplicateEmail.Message, response["message"])
 }
 
 func (suite *AuthControllerTestSuite) TestRegister_InvalidInput() {
@@ -137,12 +135,53 @@ func (suite *AuthControllerTestSuite) TestRegister_InvalidInput() {
 			w := testhelpers.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/register", tt.user, "")
 			suite.Equal(http.StatusBadRequest, w.Code)
 
-			var response map[string]string
+			var response map[string]interface{}
 			testhelpers.ParseResponse(suite.T(), w, &response)
 
-			suite.Contains(response["error"], tt.expected)
+			suite.Contains(response["message"], tt.expected)
 		})
 	}
+}
+
+func (suite *AuthControllerTestSuite) TestLogin_Success() {
+	user := model.User{
+		Email:    "login@example.com",
+		Password: "password123",
+	}
+
+	authUser := model.AuthUser{
+		Email:    "login@example.com",
+		Password: "password123",
+	}
+
+	err := user.HashPassword(suite.authService.GetPepper())
+	suite.NoError(err)
+
+	_, err = suite.userRepo.Create(context.Background(), &user)
+	suite.NoError(err, "Failed to create test user")
+
+	w := testhelpers.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/login", authUser, "")
+	suite.Equal(http.StatusOK, w.Code)
+
+	var response map[string]string
+	testhelpers.ParseResponse(suite.T(), w, &response)
+	suite.NotEmpty(response["token"])
+}
+
+func (suite *AuthControllerTestSuite) TestLogin_InvalidCredentials() {
+	authUser := model.AuthUser{
+		Email:    "login@example.com",
+		Password: "password123",
+	}
+
+	w := testhelpers.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/login", authUser, "")
+	suite.Equal(http.StatusUnauthorized, w.Code)
+
+	var response map[string]interface{}
+	testhelpers.ParseResponse(suite.T(), w, &response)
+
+	suite.Equal(errors.ErrInvalidCredentials.Message, response["message"])
+	suite.Empty(response["token"])
 }
 
 func TestAuthControllerTestSuite(t *testing.T) {

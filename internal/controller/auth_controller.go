@@ -2,10 +2,12 @@ package controller
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
 	"todo-app/internal/auth"
+	"todo-app/internal/errors"
 	"todo-app/internal/model"
 
 	"github.com/gin-gonic/gin"
@@ -42,37 +44,44 @@ func (c *AuthController) Register(ctx *gin.Context) {
 						fmt.Sprintf("%s is invalid", fieldErr.Field()))
 				}
 			}
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": strings.Join(errorMessages, ", "),
-			})
+			ctx.AbortWithError(400, errors.NewAPIError(
+				400,
+				"VALIDATION_ERROR",
+				strings.Join(errorMessages, ", "),
+			))
 			return
 		}
 
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.AbortWithError(400, errors.NewAPIErrorWithDetails(
+			400,
+			"INVALID_PAYLOAD",
+			"Invalid request body",
+			err.Error(),
+		))
 		return
 	}
 
 	createdUser, err := c.authService.Register(ctx.Request.Context(), &user)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.Error(err)
 		return
 	}
 
-	// Don't return password hash
 	createdUser.PasswordHash = ""
-	ctx.JSON(http.StatusCreated, createdUser)
+	ctx.JSON(201, createdUser)
 }
 
 func (c *AuthController) Login(ctx *gin.Context) {
 	var authUser model.AuthUser
 	if err := ctx.ShouldBindJSON(&authUser); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.AbortWithError(http.StatusBadRequest, errors.NewInvalidIDError())
 		return
 	}
 
 	token, err := c.authService.Login(ctx.Request.Context(), &authUser)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		log.Printf("Login error: %v", err)
+		ctx.AbortWithError(http.StatusUnauthorized, errors.NewInvalidCredentialsError())
 		return
 	}
 

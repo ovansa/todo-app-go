@@ -1,9 +1,10 @@
 package middleware
 
 import (
+	stderrors "errors"
 	"log"
-	"net/http"
 	"time"
+	"todo-app/internal/errors"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,19 +20,41 @@ func Logger() gin.HandlerFunc {
 }
 
 func ErrorHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Next()
+	return func(ctx *gin.Context) {
+		// Handle panics
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("Panic recovered: %v", r)
+				respondWithError(ctx, errors.ErrInternalServerError)
+			}
+		}()
 
-		if len(c.Errors) > 0 {
-			for _, err := range c.Errors {
-				log.Printf("Error: %v", err)
+		ctx.Next()
+
+		// Process any errors added to the context
+		if len(ctx.Errors) > 0 {
+			for _, ginErr := range ctx.Errors {
+				log.Printf("Error: %v", ginErr.Err)
 			}
 
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"errors": c.Errors.Errors(),
-			})
+			// Get the last error
+			lastErr := ctx.Errors.Last()
+			respondWithError(ctx, lastErr.Err)
 		}
 	}
+}
+
+func respondWithError(ctx *gin.Context, err error) {
+	var apiErr errors.APIError
+	if !stderrors.As(err, &apiErr) {
+		// Wrap unknown errors
+		apiErr = errors.ErrInternalServerError
+	}
+
+	// w.Header().Set("Content-Type", "application/json")
+	// w.WriteHeader(apiErr.Status)
+	// json.NewEncoder(w).Encode(apiErr)
+	ctx.AbortWithStatusJSON(apiErr.Status, apiErr)
 }
 
 func CORS() gin.HandlerFunc {

@@ -2,8 +2,9 @@ package repository
 
 import (
 	"context"
-	"errors"
+	stderror "errors"
 	"time"
+	"todo-app/internal/errors"
 	"todo-app/internal/model"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -32,11 +33,11 @@ func (r *userRepository) Create(ctx context.Context, user *model.User) (*model.U
 
 	// Check if email already exists
 	existingUser, err := r.FindByEmail(ctx, user.Email)
-	if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+	if err != nil && !stderror.Is(err, mongo.ErrNoDocuments) {
 		return nil, err
 	}
 	if existingUser != nil {
-		return nil, errors.New("email already exists")
+		return nil, errors.ErrDuplicateEmail
 	}
 
 	result, err := r.collection.InsertOne(ctx, user)
@@ -52,7 +53,7 @@ func (r *userRepository) FindByEmail(ctx context.Context, email string) (*model.
 	var user model.User
 	err := r.collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
+		if stderror.Is(err, mongo.ErrNoDocuments) {
 			return nil, nil
 		}
 		return nil, err

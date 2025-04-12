@@ -2,19 +2,16 @@ package auth
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
+	"todo-app/internal/errors"
 	"todo-app/internal/model"
 	"todo-app/internal/repository"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-)
-
-var (
-	ErrInvalidCredentials = errors.New("invalid credentials")
 )
 
 type Claims struct {
@@ -49,7 +46,7 @@ func NewAuthService(jwtSecret string, jwtExpiration time.Duration, pepper string
 
 func (s *authService) Register(ctx context.Context, user *model.User) (*model.User, error) {
 	if err := user.HashPassword(s.pepper); err != nil {
-		return nil, err
+		return nil, errors.NewInternalServerError()
 	}
 	return s.userRepo.Create(ctx, user)
 }
@@ -60,11 +57,11 @@ func (s *authService) Login(ctx context.Context, authUser *model.AuthUser) (stri
 		return "", err
 	}
 	if user == nil {
-		return "", ErrInvalidCredentials
+		return "", errors.ErrInvalidCredentials
 	}
 
 	if err := user.ComparePassword(authUser.Password, s.pepper); err != nil {
-		return "", ErrInvalidCredentials
+		return "", errors.ErrInvalidCredentials
 	}
 
 	claims := &Claims{
@@ -82,7 +79,7 @@ func (s *authService) Login(ctx context.Context, authUser *model.AuthUser) (stri
 func (s *authService) ParseToken(tokenString string) (*Claims, error) {
 	// First verify the token is not empty
 	if tokenString == "" {
-		return nil, errors.New("empty token string")
+		return nil, errors.NewAPIError(http.StatusBadRequest, "INVALID", "Empty token string")
 	}
 
 	// Parse with claims
@@ -104,7 +101,7 @@ func (s *authService) ParseToken(tokenString string) (*Claims, error) {
 		return claims, nil
 	}
 
-	return nil, errors.New("invalid token claims")
+	return nil, errors.NewAPIError(http.StatusBadRequest, "INVALID", "invalid token claims")
 }
 
 func (s *authService) GetPepper() string {

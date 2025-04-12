@@ -45,5 +45,8 @@ func CreateTestRequest(
 
 func ParseResponse(t *testing.T, w *httptest.ResponseRecorder, dest interface{}) {
 	err := json.Unmarshal(w.Body.Bytes(), dest)
+	if err != nil {
+		t.Logf("Failed to parse response body: %s", w.Body.String())
+	}
 	assert.NoError(t, err)
 }
