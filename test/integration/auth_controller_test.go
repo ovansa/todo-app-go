@@ -13,7 +13,7 @@ import (
 	"todo-app/internal/repository"
 	"todo-app/internal/routes"
 	"todo-app/pkg/database"
-	"todo-app/test/testhelpers"
+	"todo-app/test"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
@@ -73,11 +73,11 @@ func (suite *AuthControllerTestSuite) TestRegister_Success() {
 		Password: "password123",
 	}
 
-	w := testhelpers.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/register", newUser, "")
+	w := test.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/register", newUser, "")
 	suite.Equal(http.StatusCreated, w.Code)
 
 	var response model.User
-	testhelpers.ParseResponse(suite.T(), w, &response)
+	test.ParseResponse(suite.T(), w, &response)
 
 	suite.Equal(newUser.Email, response.Email)
 	suite.Empty(response.Password)
@@ -99,11 +99,11 @@ func (suite *AuthControllerTestSuite) TestRegister_DuplicateEmail() {
 		Email:    "test123@example.com",
 		Password: "newpassword123",
 	}
-	w := testhelpers.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/register", newUser, "")
+	w := test.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/register", newUser, "")
 	suite.Equal(http.StatusConflict, w.Code)
 
 	var response map[string]interface{}
-	testhelpers.ParseResponse(suite.T(), w, &response)
+	test.ParseResponse(suite.T(), w, &response)
 	suite.Equal(errors.ErrDuplicateEmail.Message, response["message"])
 }
 
@@ -132,11 +132,11 @@ func (suite *AuthControllerTestSuite) TestRegister_InvalidInput() {
 
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
-			w := testhelpers.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/register", tt.user, "")
+			w := test.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/register", tt.user, "")
 			suite.Equal(http.StatusBadRequest, w.Code)
 
 			var response map[string]interface{}
-			testhelpers.ParseResponse(suite.T(), w, &response)
+			test.ParseResponse(suite.T(), w, &response)
 
 			suite.Contains(response["message"], tt.expected)
 		})
@@ -160,11 +160,11 @@ func (suite *AuthControllerTestSuite) TestLogin_Success() {
 	_, err = suite.userRepo.Create(context.Background(), &user)
 	suite.NoError(err, "Failed to create test user")
 
-	w := testhelpers.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/login", authUser, "")
+	w := test.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/login", authUser, "")
 	suite.Equal(http.StatusOK, w.Code)
 
 	var response map[string]string
-	testhelpers.ParseResponse(suite.T(), w, &response)
+	test.ParseResponse(suite.T(), w, &response)
 	suite.NotEmpty(response["token"])
 }
 
@@ -174,11 +174,11 @@ func (suite *AuthControllerTestSuite) TestLogin_InvalidCredentials() {
 		Password: "password123",
 	}
 
-	w := testhelpers.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/login", authUser, "")
+	w := test.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/login", authUser, "")
 	suite.Equal(http.StatusUnauthorized, w.Code)
 
 	var response map[string]interface{}
-	testhelpers.ParseResponse(suite.T(), w, &response)
+	test.ParseResponse(suite.T(), w, &response)
 
 	suite.Equal(errors.ErrInvalidCredentials.Message, response["message"])
 	suite.Empty(response["token"])

@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -34,10 +35,15 @@ func LoadConfig() *Config {
 		jwtExpiration = defaultExpiration
 	}
 
+	port := getEnv("PORT", getEnv("SERVER_PORT", "8080"))
+	if !strings.HasPrefix(port, ":") {
+		port = ":" + port
+	}
+
 	return &Config{
 		MongoURI:       getEnv("MONGO_URI", "mongodb://localhost:27017"),
 		DatabaseName:   getEnv("DATABASE_NAME", "todo_db"),
-		ServerPort:     getEnv("SERVER_PORT", ":8080"),
+		ServerPort:     port,
 		TestMode:       testMode,
 		JWTSecret:      getEnv("JWT_SECRET", "very-secret-key"),
 		JWTExpiration:  time.Duration(jwtExpiration) * time.Second,
