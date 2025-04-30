@@ -9,7 +9,6 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://example.com/terms/",
         "contact": {
             "name": "Muhammed Ibrahim",
             "email": "aminmuhammad18@gmail.com"
@@ -534,8 +533,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
-	BasePath:         "/api",
+	Host:             "",
+	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Todo API",
 	Description:      "This is a simple todo app backend API.",

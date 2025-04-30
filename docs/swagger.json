@@ -3,15 +3,13 @@
     "info": {
         "description": "This is a simple todo app backend API.",
         "title": "Todo API",
-        "termsOfService": "http://example.com/terms/",
         "contact": {
             "name": "Muhammed Ibrahim",
             "email": "aminmuhammad18@gmail.com"
         },
         "version": "1.0"
     },
-    "host": "localhost:8080",
-    "basePath": "/api",
+    "basePath": "/",
     "paths": {
         "/auth/login": {
             "post": {

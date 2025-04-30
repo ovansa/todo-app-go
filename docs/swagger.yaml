@@ -1,4 +1,4 @@
-basePath: /api
+basePath: /
 definitions:
   errors.APIError:
     properties:
@@ -72,13 +72,11 @@ definitions:
     - fullName
     - password
     type: object
-host: localhost:8080
 info:
   contact:
     email: aminmuhammad18@gmail.com
     name: Muhammed Ibrahim
   description: This is a simple todo app backend API.
-  termsOfService: http://example.com/terms/
   title: Todo API
   version: "1.0"
 paths:
