@@ -22,6 +22,16 @@ func NewAuthController(authService auth.Service) *AuthController {
 	return &AuthController{authService: authService}
 }
 
+// Register godoc
+// @Summary      Register a new user
+// @Description  Create a new user account
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        user  body      model.User  true  "User info"
+// @Success      201   {object}  model.User
+// @Failure      400   {object}  errors.APIError
+// @Router       /auth/register [post]
 func (c *AuthController) Register(ctx *gin.Context) {
 	var user model.User
 	if err := ctx.ShouldBindJSON(&user); err != nil {
@@ -76,6 +86,17 @@ func (c *AuthController) Register(ctx *gin.Context) {
 	ctx.JSON(201, createdUser)
 }
 
+// Login godoc
+// @Summary      Authenticate user
+// @Description  Logs a user in and returns a JWT token
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        credentials  body      model.AuthUser  true  "Login credentials"
+// @Success      200          {object}  map[string]string
+// @Failure      400          {object}  errors.APIError
+// @Failure      401          {object}  errors.APIError
+// @Router       /auth/login [post]
 func (c *AuthController) Login(ctx *gin.Context) {
 	var authUser model.AuthUser
 	if err := ctx.ShouldBindJSON(&authUser); err != nil {

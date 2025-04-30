@@ -13,9 +13,25 @@ import (
 	"todo-app/internal/service"
 	"todo-app/pkg/database"
 
+	_ "todo-app/docs"
+
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @title Todo API
+// @version 1.0
+// @description This is a simple todo app backend API.
+
+// @contact.name Muhammed Ibrahim
+// @contact.email aminmuhammad18@gmail.com
+
+// @BasePath /
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	// Load configuration
 	cfg := config.LoadConfig()
@@ -50,6 +66,8 @@ func main() {
 
 	// Set up routes
 	routes.SetupRoutes(router, authController, todoController, authService)
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Start server
 	go func() {

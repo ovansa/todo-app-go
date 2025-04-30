@@ -16,6 +16,19 @@ func NewTodoController(service service.TodoService) *TodoController {
 	return &TodoController{service: service}
 }
 
+// CreateTodo godoc
+// @Summary Create a new todo
+// @Description Create a new todo item for the authenticated user
+// @Tags Todos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param todo body model.Todo true "Todo details"
+// @Success 201 {object} model.Todo
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /todos [post]
 func (c *TodoController) CreateTodo(ctx *gin.Context) {
 	userId, exists := ctx.Get("userId")
 	if !exists {
@@ -38,6 +51,18 @@ func (c *TodoController) CreateTodo(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, createdTodo)
 }
 
+// GetTodo godoc
+// @Summary Get a single todo
+// @Description Get a todo item by ID
+// @Tags Todos
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Todo ID"
+// @Success 200 {object} model.Todo
+// @Failure 401 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /todos/{id} [get]
 func (c *TodoController) GetTodo(ctx *gin.Context) {
 	userId, exists := ctx.Get("userId")
 	if !exists {
@@ -60,6 +85,16 @@ func (c *TodoController) GetTodo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, todo)
 }
 
+// GetAllTodos godoc
+// @Summary Get all todos
+// @Description Retrieve all todos for the authenticated user
+// @Tags Todos
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} model.Todo
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /todos [get]
 func (c *TodoController) GetAllTodos(ctx *gin.Context) {
 	userId, exists := ctx.Get("userId")
 	if !exists {
@@ -76,6 +111,21 @@ func (c *TodoController) GetAllTodos(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, todos)
 }
 
+// UpdateTodo godoc
+// @Summary Update a todo
+// @Description Update a todo item by ID
+// @Tags Todos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Todo ID"
+// @Param todo body model.TodoUpdate true "Updated todo data"
+// @Success 200 {object} model.Todo
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /todos/{id} [put]
 func (c *TodoController) UpdateTodo(ctx *gin.Context) {
 	userId, exists := ctx.Get("userId")
 	if !exists {
@@ -104,6 +154,17 @@ func (c *TodoController) UpdateTodo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, updatedTodo)
 }
 
+// DeleteTodo godoc
+// @Summary Delete a todo
+// @Description Delete a todo item by ID
+// @Tags Todos
+// @Security BearerAuth
+// @Param id path string true "Todo ID"
+// @Success 204 {object} nil
+// @Failure 401 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /todos/{id} [delete]
 func (c *TodoController) DeleteTodo(ctx *gin.Context) {
 	userId, exists := ctx.Get("userId")
 	if !exists {
