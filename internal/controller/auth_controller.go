@@ -28,12 +28,12 @@ func NewAuthController(authService auth.Service) *AuthController {
 // @Tags         Auth
 // @Accept       json
 // @Produce      json
-// @Param        user  body      model.User  true  "User info"
+// @Param        user  body      model.UserRegister  true  "UserRegister info"
 // @Success      201   {object}  model.User
 // @Failure      400   {object}  errors.APIError
 // @Router       /auth/register [post]
 func (c *AuthController) Register(ctx *gin.Context) {
-	var user model.User
+	var user model.UserRegister
 	if err := ctx.ShouldBindJSON(&user); err != nil {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			var errorMessages []string

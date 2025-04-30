@@ -72,6 +72,22 @@ definitions:
     - fullName
     - password
     type: object
+  model.UserRegister:
+    properties:
+      email:
+        type: string
+      fullName:
+        maxLength: 50
+        minLength: 3
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - fullName
+    - password
+    type: object
 info:
   contact:
     email: aminmuhammad18@gmail.com
@@ -118,12 +134,12 @@ paths:
       - application/json
       description: Create a new user account
       parameters:
-      - description: User info
+      - description: UserRegister info
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.User'
+          $ref: '#/definitions/model.UserRegister'
       produces:
       - application/json
       responses:

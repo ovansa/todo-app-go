@@ -21,7 +21,7 @@ type Claims struct {
 }
 
 type Service interface {
-	Register(ctx context.Context, user *model.User) (*model.User, error)
+	Register(ctx context.Context, user *model.UserRegister) (*model.User, error)
 	Login(ctx context.Context, authUser *model.AuthUser) (string, error)
 	ParseToken(tokenString string) (*Claims, error)
 	AuthMiddleware() gin.HandlerFunc
@@ -44,11 +44,16 @@ func NewAuthService(jwtSecret string, jwtExpiration time.Duration, pepper string
 	}
 }
 
-func (s *authService) Register(ctx context.Context, user *model.User) (*model.User, error) {
-	if err := user.HashPassword(s.pepper); err != nil {
+func (s *authService) Register(ctx context.Context, user *model.UserRegister) (*model.User, error) {
+	newUser := &model.User{
+		Email:    user.Email,
+		Password: user.Password,
+		FullName: user.FullName,
+	}
+	if err := newUser.HashPassword(s.pepper); err != nil {
 		return nil, errors.NewInternalServerError()
 	}
-	return s.userRepo.Create(ctx, user)
+	return s.userRepo.Create(ctx, newUser)
 }
 
 func (s *authService) Login(ctx context.Context, authUser *model.AuthUser) (string, error) {

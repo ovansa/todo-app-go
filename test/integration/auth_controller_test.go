@@ -68,7 +68,7 @@ func (suite *AuthControllerTestSuite) SetupTest() {
 }
 
 func (suite *AuthControllerTestSuite) TestRegister_Success() {
-	newUser := model.User{
+	newUser := model.UserRegister{
 		Email:    "test123@example.com",
 		Password: "password123",
 		FullName: "Test User",
@@ -97,7 +97,7 @@ func (suite *AuthControllerTestSuite) TestRegister_DuplicateEmail() {
 	_, err = suite.userRepo.Create(context.Background(), &testUser)
 	suite.NoError(err, "Failed to create test user")
 
-	newUser := model.User{
+	newUser := model.UserRegister{
 		Email:    "test123@example.com",
 		Password: "newpassword123",
 		FullName: "New User",
@@ -113,32 +113,32 @@ func (suite *AuthControllerTestSuite) TestRegister_DuplicateEmail() {
 func (suite *AuthControllerTestSuite) TestRegister_InvalidInput() {
 	tests := []struct {
 		name     string
-		user     model.User
+		user     model.UserRegister
 		expected string
 	}{
 		{
 			name:     "Empty email",
-			user:     model.User{Email: "", Password: "password123", FullName: "Test User1"},
+			user:     model.UserRegister{Email: "", Password: "password123", FullName: "Test User1"},
 			expected: "Email is required",
 		},
 		{
 			name:     "Invalid email",
-			user:     model.User{Email: "invalid", Password: "password123", FullName: "Test User2"},
+			user:     model.UserRegister{Email: "invalid", Password: "password123", FullName: "Test User2"},
 			expected: "Email must be a valid email",
 		},
 		{
 			name:     "Short password",
-			user:     model.User{Email: "test@gmail.com", Password: "short", FullName: "Test User3"},
+			user:     model.UserRegister{Email: "test@gmail.com", Password: "short", FullName: "Test User3"},
 			expected: "Password must be at least 6 characters",
 		},
 		{
 			name:     "Short full name",
-			user:     model.User{Email: "test123@gmail.com", Password: "password123", FullName: "a"},
+			user:     model.UserRegister{Email: "test123@gmail.com", Password: "password123", FullName: "a"},
 			expected: "FullName must be at least 3 characters",
 		},
 		{
 			name:     "Long full name",
-			user:     model.User{Email: "test123@gmail.com", Password: "password123", FullName: "ThisIsALongFullNameInLengthOfMoreThan50CharactersInLength"},
+			user:     model.UserRegister{Email: "test123@gmail.com", Password: "password123", FullName: "ThisIsALongFullNameInLengthOfMoreThan50CharactersInLength"},
 			expected: "FullName must be at most 50 characters",
 		},
 	}

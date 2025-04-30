@@ -82,12 +82,12 @@ const docTemplate = `{
                 "summary": "Register a new user",
                 "parameters": [
                     {
-                        "description": "User info",
+                        "description": "UserRegister info",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/model.UserRegister"
                         }
                     }
                 ],
@@ -517,6 +517,28 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "type": "string"
+                }
+            }
+        },
+        "model.UserRegister": {
+            "type": "object",
+            "required": [
+                "email",
+                "fullName",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "fullName": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6
                 }
             }
         }
