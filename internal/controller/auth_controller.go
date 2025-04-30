@@ -28,6 +28,7 @@ func (c *AuthController) Register(ctx *gin.Context) {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			var errorMessages []string
 			for _, fieldErr := range validationErrors {
+				log.Printf("Validation error: %s", fieldErr.Tag())
 				switch fieldErr.Tag() {
 				case "required":
 					errorMessages = append(errorMessages,
@@ -38,6 +39,10 @@ func (c *AuthController) Register(ctx *gin.Context) {
 				case "min":
 					errorMessages = append(errorMessages,
 						fmt.Sprintf("%s must be at least %s characters",
+							fieldErr.Field(), fieldErr.Param()))
+				case "max":
+					errorMessages = append(errorMessages,
+						fmt.Sprintf("%s must be at most %s characters",
 							fieldErr.Field(), fieldErr.Param()))
 				default:
 					errorMessages = append(errorMessages,

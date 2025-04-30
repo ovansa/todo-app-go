@@ -10,6 +10,7 @@ import (
 type User struct {
 	ID           primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	Email        string             `json:"email" bson:"email" binding:"required,email" msg:"Email is required and must be valid"`
+	FullName     string             `json:"fullName" bson:"fullName" binding:"required,min=3,max=50" msg:"Full name is required and must be between 3 and 50 characters"`
 	Password     string             `json:"password,omitempty" bson:"password" binding:"required,min=6" msg:"Password is required and must be at least 6 characters"`
 	PasswordHash string             `json:"-" bson:"passwordHash"`
 	CreatedAt    time.Time          `json:"createdAt" bson:"createdAt"`

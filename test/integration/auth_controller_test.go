@@ -71,6 +71,7 @@ func (suite *AuthControllerTestSuite) TestRegister_Success() {
 	newUser := model.User{
 		Email:    "test123@example.com",
 		Password: "password123",
+		FullName: "Test User",
 	}
 
 	w := test.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/register", newUser, "")
@@ -88,6 +89,7 @@ func (suite *AuthControllerTestSuite) TestRegister_DuplicateEmail() {
 	testUser := model.User{
 		Email:    "test123@example.com",
 		Password: "password123",
+		FullName: "Test User",
 	}
 	err := testUser.HashPassword(suite.authService.GetPepper())
 	suite.NoError(err)
@@ -98,6 +100,7 @@ func (suite *AuthControllerTestSuite) TestRegister_DuplicateEmail() {
 	newUser := model.User{
 		Email:    "test123@example.com",
 		Password: "newpassword123",
+		FullName: "New User",
 	}
 	w := test.CreateTestRequest(suite.T(), suite.router, "POST", "/auth/register", newUser, "")
 	suite.Equal(http.StatusConflict, w.Code)
@@ -115,18 +118,28 @@ func (suite *AuthControllerTestSuite) TestRegister_InvalidInput() {
 	}{
 		{
 			name:     "Empty email",
-			user:     model.User{Email: "", Password: "password123"},
+			user:     model.User{Email: "", Password: "password123", FullName: "Test User1"},
 			expected: "Email is required",
 		},
 		{
 			name:     "Invalid email",
-			user:     model.User{Email: "invalid", Password: "password123"},
+			user:     model.User{Email: "invalid", Password: "password123", FullName: "Test User2"},
 			expected: "Email must be a valid email",
 		},
 		{
 			name:     "Short password",
-			user:     model.User{Email: "test@gmail.com", Password: "short"},
+			user:     model.User{Email: "test@gmail.com", Password: "short", FullName: "Test User3"},
 			expected: "Password must be at least 6 characters",
+		},
+		{
+			name:     "Short full name",
+			user:     model.User{Email: "test123@gmail.com", Password: "password123", FullName: "a"},
+			expected: "FullName must be at least 3 characters",
+		},
+		{
+			name:     "Long full name",
+			user:     model.User{Email: "test123@gmail.com", Password: "password123", FullName: "ThisIsALongFullNameInLengthOfMoreThan50CharactersInLength"},
+			expected: "FullName must be at most 50 characters",
 		},
 	}
 
@@ -147,6 +160,7 @@ func (suite *AuthControllerTestSuite) TestLogin_Success() {
 	user := model.User{
 		Email:    "login@example.com",
 		Password: "password123",
+		FullName: "Test User",
 	}
 
 	authUser := model.AuthUser{
