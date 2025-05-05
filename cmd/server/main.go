@@ -12,6 +12,7 @@ import (
 	"todo-app/internal/routes"
 	"todo-app/internal/service"
 	"todo-app/pkg/database"
+	"todo-app/pkg/util"
 
 	_ "todo-app/docs"
 
@@ -68,6 +69,30 @@ func main() {
 	routes.SetupRoutes(router, authController, todoController, authService)
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	appURL := os.Getenv("APP_URL")
+	if appURL == "" {
+		// Detect if running on Render (they set this environment variable)
+		if onRender := os.Getenv("RENDER"); onRender != "" {
+			log.Println("APP_URL environment variable not set, but running on Render. Please set APP_URL for proper self-pinging.")
+		} else {
+			// For local development, construct a default URL
+			host := "http://localhost"
+			port := cfg.ServerPort
+			if port[0] == ':' {
+				port = port[1:] // Remove leading colon if present
+			}
+			appURL = host + ":" + port
+			log.Printf("APP_URL not set, using default: %s", appURL)
+		}
+	}
+
+	var selfPinger *util.SelfPinger
+	if appURL != "" {
+		// Ping every 14 minutes to prevent Render's 15-minute inactivity shutdown
+		selfPinger = util.NewSelfPinger(appURL+"/health", 1)
+		selfPinger.Start()
+	}
 
 	// Start server
 	go func() {

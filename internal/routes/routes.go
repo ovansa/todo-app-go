@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"time"
 	"todo-app/internal/auth"
 	"todo-app/internal/controller"
 	"todo-app/pkg/middleware"
@@ -34,7 +35,7 @@ func SetupRoutes(router *gin.Engine, authController *controller.AuthController, 
 	router.Use(middleware.CORS())
 
 	router.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{"status": "ok"})
+		ctx.JSON(200, gin.H{"status": "ok", "time": time.Now().Format(time.RFC3339)})
 	})
 
 	SetupAuthRoutes(router, authController)
