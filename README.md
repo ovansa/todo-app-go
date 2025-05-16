@@ -88,9 +88,6 @@ API documentation is available via Swagger UI at:
 http://localhost:8080/swagger/index.html
 ```
 
-### Swagger Screenshot
-![Swagger UI](https://github.com/ovansa/todo-app-go/raw/master/assets/swagger.png)
-
 ## Authentication
 
 The API uses JWT for authentication. To access protected endpoints:
