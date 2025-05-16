@@ -19,15 +19,12 @@ func NewTodoController(service service.TodoService) *TodoController {
 // CreateTodo godoc
 // @Summary Create a new todo
 // @Description Create a new todo item for the authenticated user
-// @Tags Todos
+// @Tags todos
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param todo body model.Todo true "Todo details"
+// @Param todo body model.TodoCreate true "Todo details"
 // @Success 201 {object} model.Todo
-// @Failure 400 {object} map[string]string
-// @Failure 401 {object} map[string]string
-// @Failure 500 {object} map[string]string
 // @Router /todos [post]
 func (c *TodoController) CreateTodo(ctx *gin.Context) {
 	userId, exists := ctx.Get("userId")
@@ -36,13 +33,13 @@ func (c *TodoController) CreateTodo(ctx *gin.Context) {
 		return
 	}
 
-	var todo model.Todo
-	if err := ctx.ShouldBindJSON(&todo); err != nil {
+	var todoCreate model.TodoCreate
+	if err := ctx.ShouldBindJSON(&todoCreate); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	createdTodo, err := c.service.CreateTodo(ctx.Request.Context(), userId.(string), &todo)
+	createdTodo, err := c.service.CreateTodo(ctx.Request.Context(), userId.(string), &todoCreate)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -54,14 +51,11 @@ func (c *TodoController) CreateTodo(ctx *gin.Context) {
 // GetTodo godoc
 // @Summary Get a single todo
 // @Description Get a todo item by ID
-// @Tags Todos
+// @Tags todos
 // @Produce json
 // @Security BearerAuth
 // @Param id path string true "Todo ID"
 // @Success 200 {object} model.Todo
-// @Failure 401 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
 // @Router /todos/{id} [get]
 func (c *TodoController) GetTodo(ctx *gin.Context) {
 	userId, exists := ctx.Get("userId")
@@ -88,12 +82,10 @@ func (c *TodoController) GetTodo(ctx *gin.Context) {
 // GetAllTodos godoc
 // @Summary Get all todos
 // @Description Retrieve all todos for the authenticated user
-// @Tags Todos
+// @Tags todos
 // @Produce json
 // @Security BearerAuth
 // @Success 200 {array} model.Todo
-// @Failure 401 {object} map[string]string
-// @Failure 500 {object} map[string]string
 // @Router /todos [get]
 func (c *TodoController) GetAllTodos(ctx *gin.Context) {
 	userId, exists := ctx.Get("userId")
@@ -114,17 +106,13 @@ func (c *TodoController) GetAllTodos(ctx *gin.Context) {
 // UpdateTodo godoc
 // @Summary Update a todo
 // @Description Update a todo item by ID
-// @Tags Todos
+// @Tags todos
 // @Accept json
 // @Produce json
 // @Security BearerAuth
 // @Param id path string true "Todo ID"
 // @Param todo body model.TodoUpdate true "Updated todo data"
 // @Success 200 {object} model.Todo
-// @Failure 400 {object} map[string]string
-// @Failure 401 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
 // @Router /todos/{id} [put]
 func (c *TodoController) UpdateTodo(ctx *gin.Context) {
 	userId, exists := ctx.Get("userId")
@@ -157,13 +145,10 @@ func (c *TodoController) UpdateTodo(ctx *gin.Context) {
 // DeleteTodo godoc
 // @Summary Delete a todo
 // @Description Delete a todo item by ID
-// @Tags Todos
+// @Tags todos
 // @Security BearerAuth
 // @Param id path string true "Todo ID"
 // @Success 204 {object} nil
-// @Failure 401 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
 // @Router /todos/{id} [delete]
 func (c *TodoController) DeleteTodo(ctx *gin.Context) {
 	userId, exists := ctx.Get("userId")

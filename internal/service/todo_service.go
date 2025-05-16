@@ -10,7 +10,7 @@ import (
 )
 
 type TodoService interface {
-	CreateTodo(ctx context.Context, userId string, todo *model.Todo) (*model.Todo, error)
+	CreateTodo(ctx context.Context, userId string, todoCreate *model.TodoCreate) (*model.Todo, error)
 	GetTodo(ctx context.Context, id string, userId string) (*model.Todo, error)
 	GetAllTodos(ctx context.Context, userId string) ([]*model.Todo, error)
 	UpdateTodo(ctx context.Context, id string, userId string, todo *model.TodoUpdate) (*model.Todo, error)
@@ -25,13 +25,14 @@ func NewTodoService(repo repository.TodoRepository) TodoService {
 	return &todoService{repo: repo}
 }
 
-func (s *todoService) CreateTodo(ctx context.Context, userId string, todo *model.Todo) (*model.Todo, error) {
+func (s *todoService) CreateTodo(ctx context.Context, userId string, todoCreate *model.TodoCreate) (*model.Todo, error) {
 	userObjectID, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
 		return nil, errors.New("invalid user id format")
 	}
-	todo.UserID = userObjectID
-	return s.repo.Create(ctx, todo)
+
+	ctxWithUserId := context.WithValue(ctx, "userId", userObjectID)
+	return s.repo.Create(ctxWithUserId, todoCreate)
 }
 
 func (s *todoService) GetTodo(ctx context.Context, id string, userId string) (*model.Todo, error) {

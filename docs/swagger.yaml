@@ -23,31 +23,55 @@ definitions:
     - password
     type: object
   model.Todo:
+    description: Todo represents a task that a user wants to track
     properties:
       completed:
+        example: false
         type: boolean
       createdAt:
+        example: "2022-01-01T12:00:00Z"
         type: string
       id:
+        example: 5f8d0614db5c5c7b3a18f201
         type: string
       title:
+        example: Buy groceries
         type: string
       updatedAt:
+        example: "2022-01-01T12:00:00Z"
         type: string
       userId:
+        example: 5f8d0614db5c5c7b3a18f200
+        type: string
+    required:
+    - title
+    type: object
+  model.TodoCreate:
+    description: TodoCreate is used when creating a new todo item
+    properties:
+      completed:
+        example: false
+        type: boolean
+      title:
+        example: Buy groceries
         type: string
     required:
     - title
     type: object
   model.TodoUpdate:
+    description: TodoUpdate is used when updating an existing todo item
     properties:
       completed:
+        example: true
         type: boolean
       description:
+        example: Need to get milk and eggs
         type: string
       title:
+        example: Buy more groceries
         type: string
       updatedAt:
+        example: "2022-01-02T12:00:00Z"
         type: string
     type: object
   model.User:
@@ -166,23 +190,11 @@ paths:
             items:
               $ref: '#/definitions/model.Todo'
             type: array
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
       security:
       - BearerAuth: []
       summary: Get all todos
       tags:
-      - Todos
+      - todos
     post:
       consumes:
       - application/json
@@ -193,7 +205,7 @@ paths:
         name: todo
         required: true
         schema:
-          $ref: '#/definitions/model.Todo'
+          $ref: '#/definitions/model.TodoCreate'
       produces:
       - application/json
       responses:
@@ -201,29 +213,11 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/model.Todo'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
       security:
       - BearerAuth: []
       summary: Create a new todo
       tags:
-      - Todos
+      - todos
   /todos/{id}:
     delete:
       description: Delete a todo item by ID
@@ -236,29 +230,11 @@ paths:
       responses:
         "204":
           description: No Content
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
       security:
       - BearerAuth: []
       summary: Delete a todo
       tags:
-      - Todos
+      - todos
     get:
       description: Get a todo item by ID
       parameters:
@@ -274,29 +250,11 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Todo'
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
       security:
       - BearerAuth: []
       summary: Get a single todo
       tags:
-      - Todos
+      - todos
     put:
       consumes:
       - application/json
@@ -320,35 +278,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Todo'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
       security:
       - BearerAuth: []
       summary: Update a todo
       tags:
-      - Todos
+      - todos
+schemes:
+- http
+- https
 securityDefinitions:
   BearerAuth:
     in: header

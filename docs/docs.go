@@ -119,7 +119,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Todos"
+                    "todos"
                 ],
                 "summary": "Get all todos",
                 "responses": {
@@ -129,24 +129,6 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/model.Todo"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
                             }
                         }
                     }
@@ -166,7 +148,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Todos"
+                    "todos"
                 ],
                 "summary": "Create a new todo",
                 "parameters": [
@@ -176,7 +158,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Todo"
+                            "$ref": "#/definitions/model.TodoCreate"
                         }
                     }
                 ],
@@ -185,33 +167,6 @@ const docTemplate = `{
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/model.Todo"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
                         }
                     }
                 }
@@ -229,7 +184,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Todos"
+                    "todos"
                 ],
                 "summary": "Get a single todo",
                 "parameters": [
@@ -246,33 +201,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.Todo"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
                         }
                     }
                 }
@@ -291,7 +219,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Todos"
+                    "todos"
                 ],
                 "summary": "Update a todo",
                 "parameters": [
@@ -318,42 +246,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.Todo"
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
                     }
                 }
             },
@@ -365,7 +257,7 @@ const docTemplate = `{
                 ],
                 "description": "Delete a todo item by ID",
                 "tags": [
-                    "Todos"
+                    "todos"
                 ],
                 "summary": "Delete a todo",
                 "parameters": [
@@ -380,33 +272,6 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "No Content"
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
                     }
                 }
             }
@@ -447,45 +312,74 @@ const docTemplate = `{
             }
         },
         "model.Todo": {
+            "description": "Todo represents a task that a user wants to track",
             "type": "object",
             "required": [
                 "title"
             ],
             "properties": {
                 "completed": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2022-01-01T12:00:00Z"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "5f8d0614db5c5c7b3a18f201"
                 },
                 "title": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Buy groceries"
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2022-01-01T12:00:00Z"
                 },
                 "userId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "5f8d0614db5c5c7b3a18f200"
+                }
+            }
+        },
+        "model.TodoCreate": {
+            "description": "TodoCreate is used when creating a new todo item",
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "completed": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Buy groceries"
                 }
             }
         },
         "model.TodoUpdate": {
+            "description": "TodoUpdate is used when updating an existing todo item",
             "type": "object",
             "properties": {
                 "completed": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "description": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Need to get milk and eggs"
                 },
                 "title": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Buy more groceries"
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2022-01-02T12:00:00Z"
                 }
             }
         },
@@ -557,7 +451,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "",
 	BasePath:         "/",
-	Schemes:          []string{},
+	Schemes:          []string{"http", "https"},
 	Title:            "Todo API",
 	Description:      "This is a simple todo app backend API.",
 	InfoInstanceName: "swagger",

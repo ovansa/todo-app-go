@@ -28,6 +28,7 @@ import (
 // @contact.email aminmuhammad18@gmail.com
 
 // @BasePath /
+// @schemes http https
 
 // @securityDefinitions.apikey BearerAuth
 // @in header
@@ -67,6 +68,7 @@ func main() {
 	// Set up routes
 	routes.SetupRoutes(router, authController, todoController, authService)
 
+	// Setup Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Start server

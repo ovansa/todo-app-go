@@ -12,7 +12,7 @@ import (
 )
 
 type TodoRepository interface {
-	Create(ctx context.Context, todo *model.Todo) (*model.Todo, error)
+	Create(ctx context.Context, todo *model.TodoCreate) (*model.Todo, error)
 	FindByID(ctx context.Context, id string, userId string) (*model.Todo, error)
 	FindAll(ctx context.Context, userId string) ([]*model.Todo, error)
 	Update(ctx context.Context, id string, userId string, todo *model.TodoUpdate) (*model.Todo, error)
@@ -29,9 +29,26 @@ func NewTodoRepository(db *mongo.Database, collectionName string) TodoRepository
 	}
 }
 
-func (r *todoRepository) Create(ctx context.Context, todo *model.Todo) (*model.Todo, error) {
-	todo.CreatedAt = time.Now()
-	todo.UpdatedAt = time.Now()
+func (r *todoRepository) Create(ctx context.Context, todoCreate *model.TodoCreate) (*model.Todo, error) {
+	userID, ok := ctx.Value("userId").(primitive.ObjectID)
+	if !ok {
+		return nil, errors.New("user ID not found in context or invalid format")
+	}
+
+	now := time.Now()
+
+	completed := false
+	if todoCreate.Completed != nil {
+		completed = *todoCreate.Completed
+	}
+
+	todo := &model.Todo{
+		Title:     todoCreate.Title,
+		Completed: completed,
+		CreatedAt: now,
+		UpdatedAt: now,
+		UserID:    userID,
+	}
 
 	result, err := r.collection.InsertOne(ctx, todo)
 	if err != nil {
